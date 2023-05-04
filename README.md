@@ -1,12 +1,12 @@
-# backend-engineer-test
+# Back-end Engineer Test
 
 ## Olá!
 
-# Para iniciar o projeto utilize o comando "npm install" na raiz do projeto para instalar as dependencias
+Para iniciar o projeto utilize o comando "npm install" na raiz do projeto para instalar as dependencias
 
-# Conecte se ao MySQL usando o XAMPP ao clicar na action "Start"
+Conecte se ao MySQL usando o XAMPP ao clicar na action "Start"
 
-# Crie um banco de dados chamado "backendtest" com uma tabela chamada "cashflow" com os seguintes atributos
+Crie um banco de dados chamado "backendtest" com uma tabela chamada "cashflow" com os seguintes atributos
 
 ![image](https://user-images.githubusercontent.com/102544229/236215532-15dff39e-3ba6-4107-a94c-d04580564e31.png)
 
