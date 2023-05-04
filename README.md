@@ -3,6 +3,7 @@
 ## Olá!
 
 Para iniciar o projeto utilize o comando "npm install" na raiz do projeto para instalar as dependencias
+Após instalar as dependencias utilize o comando "npm run dev"
 
 Conecte se ao MySQL usando o XAMPP ao clicar na action "Start"
 
