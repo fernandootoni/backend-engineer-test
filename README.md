@@ -14,6 +14,10 @@ Crie um banco de dados chamado "backendtest" com uma tabela chamada "cashflow" c
 
 # Rotas
 
+## Você deve passar o "id" do usuário pelo "headers" da requisição para acessar corretamente todas as rotas
+
+![image](https://user-images.githubusercontent.com/102544229/236219825-40f12f07-c609-4ffd-8678-5f27ce831c9d.png)
+
 ## "/cashflow" - GET 
 Retorna todas as informações referente ao mês e dia atual
 
