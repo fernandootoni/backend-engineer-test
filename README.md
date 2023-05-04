@@ -22,11 +22,13 @@ Retorna todas as informações do usuario independente da data e o saldo final
 
 ## "/cashflow/create" - POST
 Cria uma nova interação do usuario, espera por esses parametros 
+
 ![image](https://user-images.githubusercontent.com/102544229/236216852-502ac2d7-1cb3-4ee0-95a5-29027b7302d1.png)
 
 ## "/cashflow/bymonth" - POST
 Envia o mes e ano e retorna todas as informações de acordo com esses dois parametros, espera por esses parametros
 O ano deve ser um Numero enquanto mes uma String
+
 ![image](https://user-images.githubusercontent.com/102544229/236217405-43903256-e4dc-449f-b2a6-5d013ee014e4.png)
 
 
