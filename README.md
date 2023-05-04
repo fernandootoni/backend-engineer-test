@@ -2,8 +2,8 @@
 
 ## Olá!
 
-Para iniciar o projeto utilize o comando "npm install" na raiz do projeto para instalar as dependencias
-Após instalar as dependencias utilize o comando "npm run dev"
+Para iniciar o projeto utilize o comando "npm install" na raiz do projeto para instalar as dependências 
+Após a instalação utilize o comando "npm run dev"
 
 Conecte se ao MySQL usando o XAMPP ao clicar na action "Start"
 
@@ -16,19 +16,19 @@ Crie um banco de dados chamado "backendtest" com uma tabela chamada "cashflow" c
 # Rotas
 
 ## "/cashflow" - GET 
-Retorna todas as informações referente ao mes e dia atual
+Retorna todas as informações referente ao mês e dia atual
 
 ## "/cashflow/account" - GET
-Retorna todas as informações do usuario independente da data e o saldo final
+Retorna todas as informações do usuário independente da data e o saldo final
 
 ## "/cashflow/create" - POST
-Cria uma nova interação do usuario, espera por esses parametros 
+Cria uma nova interação do usuario, espera por esses parâmetros 
 
 ![image](https://user-images.githubusercontent.com/102544229/236216852-502ac2d7-1cb3-4ee0-95a5-29027b7302d1.png)
 
 ## "/cashflow/bymonth" - POST
-Envia o mes e ano e retorna todas as informações de acordo com esses dois parametros, espera por esses parametros
-O ano deve ser um Numero enquanto mes uma String
+Envia o mês e ano e retorna todas as informações de acordo com essas informações, espera por esses parametros
+O ano deve ser um Numero enquanto mês uma String
 
 ![image](https://user-images.githubusercontent.com/102544229/236217405-43903256-e4dc-449f-b2a6-5d013ee014e4.png)
 
