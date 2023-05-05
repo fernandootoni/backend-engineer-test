@@ -5,9 +5,11 @@ const cashFlowRoutes = Router()
 
 const cashFlowController = new CashFlowController()
 
-cashFlowRoutes.get("/account", cashFlowController.getUserAccountInformations)
+cashFlowRoutes.post("/create", cashFlowController.createCashflow)
 cashFlowRoutes.post("/bymonth", cashFlowController.getFlowBySelectedMonth)
-cashFlowRoutes.post("/create", cashFlowController.create)
+cashFlowRoutes.get("/account", cashFlowController.getUserAccountInformations)
+cashFlowRoutes.delete("/:id", cashFlowController.deleteCashflowById)
+cashFlowRoutes.post("/:id", cashFlowController.updateCashflowById)
 cashFlowRoutes.get("/", cashFlowController.getFlowByCurrentMonth)
 
 export { cashFlowRoutes }

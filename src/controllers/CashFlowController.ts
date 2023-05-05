@@ -3,95 +3,170 @@ import { getFormatDate } from '../utils/getFormatDate'
 import { convertDateInput } from '../utils/convertDateInput'
 import { ICashInteraction } from '../interface/ICashInteraction'
 import { conn } from '../index'
+import { getFirstAndLastDayOfWeek } from '../utils/getFirstAndLastDayOfWeek'
+import { getBalance } from '../utils/getBalance'
 
 interface IResponse extends Response {
-  json(data: any): any
+  json(data: { sum: number, message: string } | ICashInteraction | void): this;
+}
+
+interface IResults {
+  affectedRows: number
 }
 
 class CashFlowController {
-  async create(req: Request, res: Response): Promise<any> {
+  createCashflow(req: Request, res: Response): IResponse {
     const { user, title, day, month, year, amount, type }: ICashInteraction = req.body
     const { id: userId } = req.headers
 
-    const sqlQuery = 
-    `INSERT INTO cashflow (title, user, day, month, year, amount, type, userId) VALUES ('${title}', '${user}', '${day}', '${month}', '${year}', '${amount}', '${type}', '${userId}')`
+    const currentDate = new Date(2023, month, 0)
+    const lastDayOfTheMonth = currentDate.getDate()
+    if(day <= 0 || day > lastDayOfTheMonth) {
+      return res.status(400).json({ message: "Please enter a valid day!" })
+    }
 
-    conn.query(sqlQuery, function (err: string) {
+    const sqlQuery = 'INSERT INTO cashflow (??, ??, ??, ??, ??, ??, ??, ??) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    const sanitizedData =  [
+      'title', 'user', 'day', 'month', 'year', 'amount', 'type', 'userId',
+       title, user, day, month, year, amount, type.toLowerCase(), userId
+    ]
+
+    conn.query(sqlQuery, sanitizedData, function (err: string) {
       if(err)
-        console.log(err)
+        return res.status(400).json(err)
     })
     
-    return res.status(201).json()
+    return res.status(201).json({ message: "Cashflow created successfully!" })
   }
 
-  async getFlowByCurrentMonth(req: Request, res: Response): Promise<any> {
+  getFlowByCurrentMonth(req: Request, res: Response): void {
     const { id: userId } = req.headers
 
-    const formattedDate = getFormatDate()
-    const day = Number(formattedDate.split("/")[0])
-    const month = Number(formattedDate.split("/")[1])
+    const formattedDate:string = getFormatDate()
+    const dayNumber:number = Number(formattedDate.split("/")[0])
+    const monthNumber:number = Number(formattedDate.split("/")[1])
+    const yearNumber:number = Number(formattedDate.split("/")[2])
 
-    const sqlQuery = 
-    `SELECT * FROM cashflow WHERE month = ${month} and userId = ${userId}`
+    const sqlQuery = 'SELECT * FROM cashflow WHERE ?? = ? and ?? = ? and ?? = ?'
+    const sanitizedData = ['month', monthNumber, 'userId', userId, 'year', yearNumber]
 
-    conn.query(sqlQuery, function (err: string, data: ICashInteraction[]) {
+    conn.query(sqlQuery, sanitizedData, function (err: string, data: ICashInteraction[]) {
       if(err) {
         console.log(err)
         return res.status(400).json({ message: "Something went wrong" })
       }
 
       const cashflowByCurrentMonth = data
-      const cashflowByCurrentDay = data.filter((element: ICashInteraction) => element.day === day && element.month === month)
 
-      return res.status(200).json({cashflowByCurrentMonth, cashflowByCurrentDay})
+      const cashflowByCurrentDay = 
+        data.filter((element: ICashInteraction) => 
+        element.day === dayNumber && 
+        element.month === monthNumber
+      )
+      
+      const currentDate = new Date(2023, monthNumber, 0)
+      const lastDayOfTheSelectedMonth = currentDate.getDate()
+      const daysOfTheWeek = getFirstAndLastDayOfWeek(dayNumber, lastDayOfTheSelectedMonth)
+
+      const cashflowByCurrentWeek = 
+        data.filter((element: ICashInteraction) => 
+        element.day >= daysOfTheWeek.firstDayOfTheWeek && 
+        element.day <= daysOfTheWeek.lastDayOfTheWeek
+      )
+
+      const dayBalance = getBalance(cashflowByCurrentDay)
+      const weekBalance = getBalance(cashflowByCurrentWeek)
+      const monthBalance = getBalance(cashflowByCurrentMonth)
+
+      return res.status(200).json({
+        cashflowByCurrentDay, dayBalance,
+        cashflowByCurrentWeek, weekBalance,
+        cashflowByCurrentMonth, monthBalance
+      })
     })
   }
 
-  getFlowBySelectedMonth(req: Request, res: Response): any {
+  getFlowBySelectedMonth(req: Request, res: Response): void {
     const { month, year } = req.body
-    const { id } = req.headers
+    const { id: userId } = req.headers
 
     const selectedMonthNumber = convertDateInput(month)
     
-    const sqlQuery = 
-    `SELECT * FROM cashflow WHERE month = ${selectedMonthNumber} and year = ${year} and userId = ${id}`
+    const sqlQuery = 'SELECT * FROM cashflow WHERE ?? = ? and ?? = ? and ?? = ?'
+    const sanitizedData = ['month', selectedMonthNumber, 'year', year, 'userId', userId]
 
-    conn.query(sqlQuery, function (err: string, data: ICashInteraction) {
+    conn.query(sqlQuery, sanitizedData, function (err: string, data: ICashInteraction[]) {
       if(err) {
-        console.log(err)
-        return res.json({ message: "Something went wrong" })
+        return res.json({ message: err })
       }
 
       const cashflowBySelectedMonth = data
+      const monthBalance = getBalance(data)
 
-      return res.json(cashflowBySelectedMonth)
+      return res.json({cashflowBySelectedMonth, monthBalance})
     })
   }
 
-  getUserAccountInformations(req: Request, res: Response): any {
+  getUserAccountInformations(req: Request, res: Response): void {
     const { id: userId } = req.headers
 
-    const sqlQuery = 
-    `SELECT * FROM cashflow WHERE userId = ${userId}`
+    const sqlQuery = 'SELECT * FROM cashflow WHERE ?? = ?'
+    const sanitizedData = ['userId', userId]
 
-    conn.query(sqlQuery, function (err: string, data: any) {
+    conn.query(sqlQuery, sanitizedData, function (err: string, data: any) {
       if(err) {
         console.log(err)
         return res.json({ message: "Something went wrong" })
       }
 
       const cashflowByUser = data
+      const monthBalance = getBalance(data)
 
-      let sum: number = 0
-      data.forEach((element: any) => {
-        if(element.type === 'deposit') {
-          sum += element.amount
-        } else {
-          sum -= element.amount
-        }
-      });
+      return res.json({
+        cashflowByUser, 
+        monthBalance
+      })
+    })
+  }
 
-      return res.json({cashflowByUser, sum})
+  updateCashflowById(req: Request, res: Response): void {
+    const { id } = req.params
+    const { id: userId } = req.headers
+    const { title, amount, day, month, year, type } = req.body
+    
+    const sqlQuery = 
+      'UPDATE cashflow SET ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ?, ?? = ? WHERE ?? = ? AND ?? = ?'
+    const sanitizedData = [
+      'title', title, 'amount', amount, 'day', day, 'month', month, 
+      'year', year, 'type', type.toLowerCase(), 'id', id, 'userId', userId
+    ]
+    
+    conn.query(sqlQuery, sanitizedData, function (err: string, results: IResults) {
+      if(err)
+        return res.status(400).json(err)
+
+      if(results.affectedRows === 0) 
+        return res.status(200).json({ message: "Error while trying to update the cashflow"})
+        
+      return res.status(200).json({message: "Cashflow updated Successfully!"})
+    })
+  }
+
+  deleteCashflowById(req: Request, res: Response): void {
+    const { id } = req.params
+    const { id: userId } = req.headers
+
+    const sqlQuery = 'DELETE FROM cashflow WHERE ?? = ? AND ?? = ?'
+    const sanitizedData = ['id', id, 'userId', userId]
+
+    conn.query(sqlQuery, sanitizedData, function (err: string, results: IResults) {
+      if(err)
+        return res.status(400).json(err)
+
+      if(results.affectedRows === 0) 
+        return res.status(200).json({ message: "Error while trying to delete the cashflow"})
+        
+      return res.status(200).json({message: "Cashflow deleted Successfully!"})
     })
   }
 }
