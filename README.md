@@ -19,7 +19,7 @@ Crie um banco de dados chamado "backendtest" com uma tabela chamada "cashflow" c
 ![image](https://user-images.githubusercontent.com/102544229/236219825-40f12f07-c609-4ffd-8678-5f27ce831c9d.png)
 
 ## "/cashflow" - GET 
-Retorna todas as informações referente ao mês e dia atual
+Retorna todas as informações referente ao mês, semana e dia atual, junto com o saldo final de cada
 
 ## "/cashflow/account" - GET
 Retorna todas as informações do usuário independente da data e o saldo final
@@ -34,5 +34,14 @@ Envia o mês e ano e retorna todas as informações de acordo com essas informa�
 O ano deve ser um Numero enquanto mês uma String
 
 ![image](https://user-images.githubusercontent.com/102544229/236217405-43903256-e4dc-449f-b2a6-5d013ee014e4.png)
+
+## "/cashflow/:id" - POST
+Atualiza o cashflow de acordo com o "id" informado no params, o cashflow precisa ter o mesmo id de usuario que o id passado no header para poder ser atualizado
+Recebe esses parametros no body
+
+![image](https://user-images.githubusercontent.com/102544229/236354789-4e6af403-ebd1-47c0-8b4c-640fc81b8851.png)
+
+## "/cashflow/:id" - DELETE
+Deleta o cashflow de acordo com o id informado no params, o userId do cashflow precisa ter o mesmo id do headers
 
 
